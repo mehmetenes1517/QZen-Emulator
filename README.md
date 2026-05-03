@@ -6,7 +6,7 @@ examples are :
 
 **Examples/GPUVisualizer** --> If you have raylib installed on your compiler , you can build it
 
-**Examples/CLIVisualizer** --> Portable version of visualizer
+**Examples/CLIVisualizer** --> Portable cli version of visualizer
 
 -------------------------------------------------------------------------------------------
 
