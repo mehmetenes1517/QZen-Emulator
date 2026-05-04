@@ -41,7 +41,7 @@ FLAGS | 8 bit | overflow, sign , zero bits | 0x05
 ### Instruction Set
 ---------------------------------------------------------------------------------------------
 
-Instruction | Purpose |
+Instruction | Purpose | Machine Code Macro
 --- | --- | ---
 0x00 | load memory to A register | _LB_A 
 0x01 | load memory to B register | _LB_B
