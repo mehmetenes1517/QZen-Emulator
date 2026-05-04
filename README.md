@@ -72,7 +72,7 @@ Instruction | Purpose | Machine Code Macro
 **Example:**
 
     0x14,0xff,0xff 
-it stores the 8-bit value inside of the 0xffff address to our A register  
+it stores the 8-bit value inside of the A register to 0xffff address
 
 --------------------------------------------------------------------------------------------- 
 
