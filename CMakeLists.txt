@@ -5,9 +5,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin)
 project(${PROJECT_NAME})
 
 set(LIB_SOURCE
-${CMAKE_SOURCE_DIR}/src/ControlUnit.cpp
-${CMAKE_SOURCE_DIR}/src/LogicUnit.cpp
-${CMAKE_SOURCE_DIR}/src/Memory.cpp
+    ${CMAKE_SOURCE_DIR}/src/ControlUnit.cpp
+    ${CMAKE_SOURCE_DIR}/src/LogicUnit.cpp
+    ${CMAKE_SOURCE_DIR}/src/Memory.cpp
+    ${CMAKE_SOURCE_DIR}/src/Util.cpp
 )
 add_library(QZenLib ${LIB_SOURCE})
 
@@ -20,5 +21,8 @@ if(LINUX)
 else()
     target_link_libraries(GPUVisualizer QZenLib raylib)
 endif()
+
+add_executable(UnitTests ${CMAKE_SOURCE_DIR}/tests/main.cpp)
+target_link_libraries(UnitTests QZenLib)
 
 

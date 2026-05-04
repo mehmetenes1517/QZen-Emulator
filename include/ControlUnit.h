@@ -10,11 +10,35 @@
 #include <vector>
 
 struct ControlUnit{
+    private:
+        void ld_a_from_address();
+        void ld_b_from_address();
+        void ld_c_from_address();
+        void ld_d_from_address();
+        void str_a_to_address();
+        void str_b_to_address();
+        void str_c_to_address();
+        void str_d_to_address();
+        void immediate_load();
+        void copy_register();
+        void Jump();
+        void Jump_zero();
+        void Jump_nonzero();
+        void Jump_Less();
+        void Jump_LessEqual();
+        void Jump_Greater();
+        void Jump_GreaterEqual();
+        void AddRegs();
+        void SubRegs();
+        void CmpRegs();
+    public:
+        friend uint8_t& DecodeRegister(ControlUnit& obj,uint8_t encoded_value);
+
     float frequency_hz=2.0f;
     bool debugmode=true;
     uint8_t A=0x00,B=0x00,C=0x00,D=0x00;
     uint8_t PC=0x00;
-    uint8_t FLAGS=0x00;// 0 -> zero flag , 1 -> carry flag , 2-> negative flag
+    uint8_t FLAGS=0x00;// 0 -> zero bit , 1 -> sign bit , 2-> overflow bit
     Memory memory;
     ALU alu;
 

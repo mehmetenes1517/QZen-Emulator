@@ -5,27 +5,34 @@
 #include <string>
 #include <thread>
 #include <raylib.h>
-#include "../include/ControlUnit.h"
+#include "../include/Main.h"
 int main(){
 
-    ControlUnit cu(5,true);
+    ControlUnit cu(20,true);
     //Example program
     // start:
-    // mov A,5
-    // mov B,1
-    // mov C,26
+    // ldi A,5
+    // ldi B,1
+    // ldi C,26
     // add:
     // add A <- A+B
     // cmp A,C
-    // jnz add:
+    // jle add:
+    // lb B,[0xffff]
+    // add A,B
+    // str [0xffff], A
+    // jmp 0x0000
     cu.LoadProgram({
-        0xf1,5,//mov a,5
-        0xf2,1,//mov b,1
-        0xf3,26,//mov c,1
-        0xf9,//add a,b
-        0xe2,//cmp a,c
-        0xe0,0x06,//jump to add a,b line
-        0xf0,0x0a //jump to same line
+        _LDI,_A,5,
+        _LDI,_B,1,
+        _LDI,_C,26,
+        _ADD,_A,_B,
+        _CMP,_A,_C,
+        _JLE,0x00,0x09,
+        _LB_B,0xFF,0xFF,
+        _ADD,_A,_B,
+        _STR_A,0xFF,0xFF,
+        _JMP,0x00,0x00
     });
 
     auto thr=std::thread([&](){
@@ -42,10 +49,10 @@ int main(){
             DrawText(std::string("B : "+std::to_string(cu.B)).c_str(),10, 20, 24, BLACK);
             DrawText(std::string("C : "+std::to_string(cu.C)).c_str(),10, 40, 24, BLACK);
             DrawText(std::string("D : "+std::to_string(cu.D)).c_str(),10, 60, 24, BLACK);
-            DrawText(std::string("Memory 0xff : "+std::to_string(cu.memory.data[0xff])).c_str(),10, 80, 24, BLACK);
-            DrawText(std::string("Memory 0xfe : "+std::to_string(cu.memory.data[0xfe])).c_str(),10, 100, 24, BLACK);
-            DrawText(std::string("Memory 0xfd : "+std::to_string(cu.memory.data[0xfd])).c_str(),10, 120, 24, BLACK);
-            DrawText(std::string("Memory 0xfc : "+std::to_string(cu.memory.data[0xfc])).c_str(),10, 140, 24, BLACK);
+            DrawText(std::string("Memory 0xffff : "+std::to_string(cu.memory.data[0xffff])).c_str(),10, 80, 24, BLACK);
+            DrawText(std::string("Memory 0xfffe : "+std::to_string(cu.memory.data[0xfffe])).c_str(),10, 100, 24, BLACK);
+            DrawText(std::string("Memory 0xfffd : "+std::to_string(cu.memory.data[0xfffd])).c_str(),10, 120, 24, BLACK);
+            DrawText(std::string("Memory 0xfffc : "+std::to_string(cu.memory.data[0xfffc])).c_str(),10, 140, 24, BLACK);
             DrawText(std::string("Flags : "+std::to_string(cu.FLAGS)).c_str(),10, 160, 24, BLACK);
             DrawText(std::string("Program Counter : "+std::to_string(cu.PC)).c_str(),10, 180, 24, BLACK);
 

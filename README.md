@@ -25,51 +25,54 @@ building CLI visualizer
 ---------------------------------------------------------------------------------------------
 ### Registers
 
-Register | Size | Info 
---- | --- | ---
-A | 8 bit | General Purpose
-B | 8 bit | General Purpose
-C | 8 bit | General Purpose
-D | 8 bit | General Purpose
-PC | 8 bit | Program counter
-FLAGS | 8 bit | zero,signed,carry bits
+Register | Size | Info | Code
+--- | --- | --- | ---
+A | 8 bit | General Purpose | 0x00
+B | 8 bit | General Purpose | 0x01
+C | 8 bit | General Purpose | 0x02
+D | 8 bit | General Purpose | 0x03
+PC | 8 bit | Program counter | 0x04
+FLAGS | 8 bit | overflow, sign , zero bits | 0x05
 
-**Memory Size :** 256 bytes
+**Memory Size :** 64 kilo bytes
 
 
 
 ### Instruction Set
 ---------------------------------------------------------------------------------------------
 
-Instruction | Purpose
---- | ---
-0xF0 | jmp -> address
-0xF1 | mov A -> value
-0xF2 | mov B -> value
-0xF3 | mov C -> value
-0xF4 | mov D -> value
-0xF5 | mov A -> address
-0xF6 | mov B -> address
-0xF7 | mov C -> address
-0xF8 | mov D -> address
-0xF9 | add A, B 
-0xFA | add A, C
-0xFB | add A, D
-0xFC | sub A, B
-0xFD | sub A, C
-0xFE | sub A, D
-0xFF | jz -> address
-0xE0 | jnz -> address
-0xE1 | cmp A,B
-0xE2 | cmp A,C
-0xE3 | cmp A,D
+Instruction | Purpose |
+--- | --- | ---
+0x00 | load memory to A register | _LB_A 
+0x01 | load memory to B register | _LB_B
+0x02 | load memory to C register | _LB_C
+0x03 | load memory to D register | _LB_D
+0x04 | immediate mode load to registers | _LDI
+0x05 | copy register to another | _CPY 
+0x06 | add registers | _ADD
+0x07 | subtract registers | _SUB
+0x08 | multiply registers | _MUL
+0x09 | xor bitwise operation between registers | _XOR 
+0x0A | and bitwise operation between registers | _AND
+0x0B | or bitwise operation between registers | _OR
+0x0C | comparison between registers | _CMP
+0x0D | unconditional jump | _JMP
+0x0E | jump if zero flag is 1 | _JZ
+0x0F | jump if zero flag is not 1 | _JNZ
+0x10 | jump if zf==0 and signf==1 | _JL
+0x11 | jump if zf==0 and signf==0 | _JG
+0x12 | jump if signf==1 | _JLE
+0x13 | jump if signf==0 | _JGE
+0x14 | store A register to memory address | _STR_A
+0x15 | store B register to memory address | _STR_B
+0x16 | store C register to memory address | _STR_C
+0x17 | store D register to memory address | _STR_D
 
-**Note :** The instructions i write as '->' are requires second operand 
 
 **Example:**
 
-    0xF5 0XFF 
-it moves the 8-bit value inside of the 0xff address to our A register  
+    0x14,0xff,0xff 
+it stores the 8-bit value inside of the 0xffff address to our A register  
 
 --------------------------------------------------------------------------------------------- 
 
@@ -82,10 +85,10 @@ we load our program to 0x00 address
 
 Address | Description
 --- | ---
-0xFF | PINGROUP A
-0xFE | PINGROUP B
-0xFD | PINGROUP C
-0xFC | PINGROUP D
+0xFFFF | PINGROUP A
+0xFFFE | PINGROUP B
+0xFFFD | PINGROUP C
+0xFFFC | PINGROUP D
 
 Each address will control 8 pins etc... , its not decided yet.
 

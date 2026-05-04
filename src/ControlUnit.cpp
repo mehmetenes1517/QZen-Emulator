@@ -1,9 +1,11 @@
 #include "../include/ControlUnit.h"
+#include"../include/Util.h"
 ControlUnit::ControlUnit(float frequency,bool debug_on):frequency_hz(frequency),debugmode(debug_on){
     Restart();
 }
 void ControlUnit::Restart(){
-    A=B=C=D=PC=0x00;
+    A=B=C=D=0x00;
+    PC=0X0000;
     memory.data.fill(0x00);
 }
 void ControlUnit::LoadProgram(const std::vector<uint8_t>& instructions){
@@ -17,148 +19,73 @@ uint8_t ControlUnit::Fetch(){
 void ControlUnit::Decode_Execute(uint8_t command){
     //COMMAND DECODE
     switch (command) {
-        case 0xf0:{// jump to address unconditionally
-            PC=memory.data[PC];
-            if(debugmode){
-                std::cout<<"\nJUMP 0x"<<std::hex<<int(PC)<<std::flush;
-            }
+        case 0x00:{
+            ld_a_from_address();
             break;
-        }
-        case 0xf1:{//mov value to A register
-            A=memory.data[PC];
-            if(debugmode){
-                std::cout<<"\nMOV A, "<<std::hex<<int(A)<<"\n"<<std::flush;
-            }
-            PC++;
+        }case 0x01:{
+            ld_b_from_address();
             break;
-        }
-        case 0xf2:{//mov value to B register
-            B=memory.data[PC];
-            if(debugmode){
-                std::cout<<"\nMOV B, "<<int(memory.data[PC])<<std::flush;
-            }
-            PC++;
+        }case 0x02:{
+            ld_c_from_address();
             break;
-        }
-        case 0xf3:{//mov value to C register
-            C=memory.data[PC];
-            if(debugmode){
-                std::cout<<"\nMOV C, "<<int(memory.data[PC])<<std::flush;
-            }
-            PC++;
+        }case 0x03:{
+            ld_d_from_address();
             break;
-        }
-        case 0xf4:{//mov value to D register
-            D=memory.data[PC];
-            if(debugmode){
-                std::cout<<"\nMOV D, "<<int(memory.data[PC])<<std::flush;
-            }
-            PC++;
+        }case 0x04:{
+            immediate_load();
             break;
-        }
-        case 0xf5:{//mov A Register to address
-            memory.write(memory.read(PC), A);
-            PC++;
+        }case 0x05:{
+            copy_register();
             break;
-        }
-        case 0xf6:{//mov B Register to address
-            memory.write(memory.read(PC), B);
-            PC++;
+        }case 0x06:{
+            AddRegs();
             break;
-        }
-        case 0xf7:{//mov C Register to address
-            memory.write(memory.read(PC), C);
-            PC++;
+        }case 0x07:{
+            SubRegs();
             break;
-        }
-        case 0xf8:{//mov D Register to address
-            memory.write(memory.read(PC), D);
-            PC++;
+        }case 0x08:{
             break;
-        }
-        case 0xf9:{//add A register with B store in A
-            alu._add_(A, B,FLAGS);
-            if(debugmode){
-                std::cout<<"\nADD A,B"<<std::flush;
-            }
+        }case 0x09:{
             break;
-        }
-        case 0xfa:{//add A register with C store in A
-            alu._add_(A, C,FLAGS);
-            if(debugmode){
-                std::cout<<"\nADD A,C"<<std::flush;
-            }
+        }case 0x0A:{
             break;
-        }
-        case 0xfb:{//add A register with D store in A
-            alu._add_(A, D,FLAGS);
-            if(debugmode){
-                std::cout<<"\nADD A,D"<<std::flush;
-            }
+        }case 0x0B:{
             break;
-        }
-        case 0xfc:{//subtract B register from A store in A
-            alu._sub_(A, B,FLAGS);
-            if(debugmode){
-                std::cout<<"\nSUB A,B"<<std::flush;
-            }
+        }case 0x0C:{
+            CmpRegs();
             break;
-        }
-        case 0xfd:{//subtract C register from A store in A
-            alu._sub_(A, C,FLAGS);
-            if(debugmode){
-                std::cout<<"\nSUB A,C"<<std::flush;
-            }
+        }case 0x0D:{
+            Jump();
             break;
-        }
-        case 0xfe:{//subtract D register from A store in A
-            alu._sub_(A, C,FLAGS);
-            if(debugmode){
-                std::cout<<"\nSUB A,D"<<std::flush;
-            }
+        }case 0x0E:{
+            Jump_zero();
             break;
-        }
-        case 0xff:{// jump if zero flag is 1
-            if((FLAGS&0x01) == 1){
-                PC=memory.data[PC];
-                if(debugmode){
-                    std::cout<<"\nCONDTITONAL JUMP 0x"<<std::hex<<int(PC)<<std::flush;
-                }
-            }else{
-                PC++;
-            }
+        }case 0x0F:{
+            Jump_nonzero();
             break;
-        }
-        case 0xe0:{//jump if zero flag is not 1
-            if((FLAGS&0x01) != 1){
-                PC=memory.read(PC);
-                if(debugmode){
-                    std::cout<<"\nCONDITIONAL JUMP 0x"<<std::hex<<int(PC)<<std::flush;
-                }
-            }else{
-                PC++;
-            }
+        }case 0x10:{
+            Jump_Less();
             break;
-        }
-        case 0xe1:{// compare A with B
-            alu._cmp_(A, B, FLAGS);
-            if(debugmode){
-                std::cout<<"\nCompare A B"<<std::flush;
-            }
+        }case 0x11:{
+            Jump_Greater();
             break;
-        }
-        case 0xe2:{// compare A with C
-            alu._cmp_(A, C, FLAGS);
-            if(debugmode){
-                std::cout<<"\nCompare A C"<<std::flush;
-            }
+        }case 0x12:{
+            Jump_LessEqual();
             break;
-        }
-        case 0xe3:{// compare A with D
-            alu._cmp_(A, D, FLAGS);
-            if(debugmode){
-                std::cout<<"\nCompare A D"<<std::flush;
-            }
+        }case 0x13:{
+            Jump_GreaterEqual();
+            break;
+        }case 0x14:{
+            str_a_to_address();
+            break;
+        }case 0x15:{
+            str_b_to_address();
+            break;
+        }case 0x16:{
+            str_c_to_address();
+            break;
+        }case 0x17:{
+            str_d_to_address();
             break;
         }
         default:{
@@ -179,3 +106,128 @@ void ControlUnit::Run(){
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0f*(1.0f/frequency_hz))));
     }
 }
+void ControlUnit::ld_a_from_address(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    A=memory.read(ByteConcat(upper,lower));
+}
+void ControlUnit::ld_b_from_address(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    B=memory.read(ByteConcat(upper,lower));
+}
+void ControlUnit::ld_c_from_address(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    C=memory.read(ByteConcat(upper,lower));
+
+}
+void ControlUnit::ld_d_from_address(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    D=memory.read(ByteConcat(upper,lower));
+
+}
+void ControlUnit::immediate_load(){
+    uint8_t& reg=DecodeRegister(*this,memory.read(PC++));
+    uint8_t value=memory.read(PC++);
+    reg=value;
+
+}
+void ControlUnit::copy_register(){
+    uint8_t& reg1=DecodeRegister(*this,memory.read(PC++));
+    uint8_t& reg2=DecodeRegister(*this,memory.read(PC++));
+    reg1=reg2;
+
+}
+
+void ControlUnit::AddRegs(){
+    uint8_t& reg1=DecodeRegister(*this,memory.read(PC++));
+    uint8_t& reg2=DecodeRegister(*this,memory.read(PC++));
+    alu._add_(reg1,reg2,FLAGS);
+}
+void ControlUnit::SubRegs(){
+    uint8_t& reg1=DecodeRegister(*this,memory.read(PC++));
+    uint8_t& reg2=DecodeRegister(*this,memory.read(PC++));
+    alu._sub_(reg1,reg2,FLAGS);
+}
+void ControlUnit::CmpRegs(){
+    uint8_t& reg1=DecodeRegister(*this,memory.read(PC++));
+    uint8_t& reg2=DecodeRegister(*this,memory.read(PC++));
+    alu._cmp_(reg1,reg2,FLAGS);
+}
+
+void ControlUnit::Jump(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    std::cout<<"\nJUMP ADDRESS "<<ByteConcat(upper,lower)<<std::flush;
+    PC=ByteConcat(upper,lower);
+
+}
+void ControlUnit::Jump_zero(){
+    if((FLAGS&1)==1){
+        Jump();
+    }else{
+        PC+=2;
+    }
+}
+void ControlUnit::Jump_nonzero(){
+    if((FLAGS&(1))!=1){
+        Jump();
+    }else{
+        PC+=2;
+    }
+}
+void ControlUnit::Jump_Less(){
+    if(((FLAGS>>1)&(1))==1 && ((FLAGS)&(1))==0){
+        Jump();
+    }else{
+        PC+=2;
+    }
+}
+void ControlUnit::Jump_LessEqual(){
+    if(((FLAGS>>1)&(1))==1){
+        Jump();
+    }else{
+        PC+=2;
+    }
+}
+void ControlUnit::Jump_Greater(){
+    if(((FLAGS>>1)&(1))==0 && ((FLAGS)&(1))==0){
+        Jump();
+    }else{
+        PC+=2;
+    }
+}
+void ControlUnit::Jump_GreaterEqual(){
+    if(((FLAGS>>1)&(1))==0){
+        Jump();
+    }else{
+        PC+=2;
+    }
+}
+void ControlUnit::str_a_to_address(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    uint16_t address=ByteConcat(upper,lower);
+    memory.write(address,A);
+}
+void ControlUnit::str_b_to_address(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    uint16_t address=ByteConcat(upper,lower);
+    memory.write(address,B);
+}
+void ControlUnit::str_c_to_address(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    uint16_t address=ByteConcat(upper,lower);
+    memory.write(address,C);
+}
+void ControlUnit::str_d_to_address(){
+    uint8_t upper=memory.read(PC++);
+    uint8_t lower=memory.read(PC++);
+    uint16_t address=ByteConcat(upper,lower);
+    memory.write(address,D);
+}
+        
