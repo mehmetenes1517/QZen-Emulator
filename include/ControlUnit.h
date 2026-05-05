@@ -11,6 +11,7 @@
 
 struct ControlUnit{
     private:
+        uint8_t get_next_arg();
         void ld_a_from_address();
         void ld_b_from_address();
         void ld_c_from_address();
@@ -30,6 +31,13 @@ struct ControlUnit{
         void Jump_GreaterEqual();
         void AddRegs();
         void SubRegs();
+        void MulRegs();
+        void AddCRegs();
+        void XORRegs();
+        void ANDRegs();
+        void ORRegs();
+        void INCReg();
+        void DECReg();
         void CmpRegs();
     public:
         friend uint8_t& DecodeRegister(ControlUnit& obj,uint8_t encoded_value);

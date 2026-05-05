@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.30)
 set(PROJECT_NAME QZenEmulator)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin)
@@ -22,7 +23,7 @@ else()
     target_link_libraries(GPUVisualizer QZenLib raylib)
 endif()
 
-add_executable(UnitTests ${CMAKE_SOURCE_DIR}/tests/main.cpp)
-target_link_libraries(UnitTests QZenLib)
+add_executable(ALUUnitTests ${CMAKE_SOURCE_DIR}/tests/alu_tests.cpp)
+target_link_libraries(ALUUnitTests QZenLib)
 
 

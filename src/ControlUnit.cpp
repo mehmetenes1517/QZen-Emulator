@@ -1,11 +1,13 @@
 #include "../include/ControlUnit.h"
 #include"../include/Util.h"
+#include"../include/Instructions.h"
 ControlUnit::ControlUnit(float frequency,bool debug_on):frequency_hz(frequency),debugmode(debug_on){
     Restart();
 }
 void ControlUnit::Restart(){
     A=B=C=D=0x00;
     PC=0X0000;
+    ResetFlags(FLAGS);
     memory.data.fill(0x00);
 }
 void ControlUnit::LoadProgram(const std::vector<uint8_t>& instructions){
@@ -19,72 +21,85 @@ uint8_t ControlUnit::Fetch(){
 void ControlUnit::Decode_Execute(uint8_t command){
     //COMMAND DECODE
     switch (command) {
-        case 0x00:{
+        case _LB_A:{
             ld_a_from_address();
             break;
-        }case 0x01:{
+        }case _LB_B:{
             ld_b_from_address();
             break;
-        }case 0x02:{
+        }case _LB_C:{
             ld_c_from_address();
             break;
-        }case 0x03:{
+        }case _LB_D:{
             ld_d_from_address();
             break;
-        }case 0x04:{
+        }case _LDI:{
             immediate_load();
             break;
-        }case 0x05:{
+        }case _CPY:{
             copy_register();
             break;
-        }case 0x06:{
+        }case _ADD:{
             AddRegs();
             break;
-        }case 0x07:{
+        }case _SUB:{
             SubRegs();
             break;
-        }case 0x08:{
+        }case _MUL:{
+            MulRegs();
             break;
-        }case 0x09:{
+        }case _ADDC:{
+            AddCRegs();
             break;
-        }case 0x0A:{
+        }case _XOR:{
+            XORRegs();
             break;
-        }case 0x0B:{
+        }case _AND:{
+            ANDRegs();
             break;
-        }case 0x0C:{
+        }case _OR:{
+            ORRegs();
+            break;
+        }case _CMP:{
             CmpRegs();
             break;
-        }case 0x0D:{
+        }case _INC:{
+            INCReg();            
+            break;
+        }case _DEC:{
+            DECReg();
+            break;
+        }case _JMP:{
             Jump();
             break;
-        }case 0x0E:{
+        }case _JZ:{
             Jump_zero();
             break;
-        }case 0x0F:{
+        }case _JNZ:{
             Jump_nonzero();
             break;
-        }case 0x10:{
+        }case _JL:{
             Jump_Less();
             break;
-        }case 0x11:{
+        }case _JG:{
             Jump_Greater();
             break;
-        }case 0x12:{
+        }case _JLE:{
             Jump_LessEqual();
             break;
-        }case 0x13:{
+        }case _JGE:{
             Jump_GreaterEqual();
             break;
-        }case 0x14:{
+        }case _STR_A:{
             str_a_to_address();
             break;
-        }case 0x15:{
+        }case _STR_B:{
             str_b_to_address();
             break;
-        }case 0x16:{
+        }case _STR_C:{
             str_c_to_address();
             break;
-        }case 0x17:{
+        }case _STR_D:{
             str_d_to_address();
             break;
         }
@@ -100,107 +115,143 @@ void ControlUnit::Decode_Execute(uint8_t command){
 
 }
 void ControlUnit::Run(){
-    while (PC<memory.data.size() ){
+    while (true){
         uint8_t command=Fetch();
         Decode_Execute(command);
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0f*(1.0f/frequency_hz))));
+        PC=PC%(0XFFFF+1);
     }
 }
+uint8_t ControlUnit::get_next_arg(){
+    return memory.read(PC++);
+}
 void ControlUnit::ld_a_from_address(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     A=memory.read(ByteConcat(upper,lower));
 }
 void ControlUnit::ld_b_from_address(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     B=memory.read(ByteConcat(upper,lower));
 }
 void ControlUnit::ld_c_from_address(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     C=memory.read(ByteConcat(upper,lower));
 
 }
 void ControlUnit::ld_d_from_address(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     D=memory.read(ByteConcat(upper,lower));
 
 }
 void ControlUnit::immediate_load(){
-    uint8_t& reg=DecodeRegister(*this,memory.read(PC++));
-    uint8_t value=memory.read(PC++);
+    uint8_t& reg=DecodeRegister(*this,get_next_arg());
+    uint8_t value=get_next_arg();
     reg=value;
 
 }
 void ControlUnit::copy_register(){
-    uint8_t& reg1=DecodeRegister(*this,memory.read(PC++));
-    uint8_t& reg2=DecodeRegister(*this,memory.read(PC++));
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
     reg1=reg2;
 
 }
 
 void ControlUnit::AddRegs(){
-    uint8_t& reg1=DecodeRegister(*this,memory.read(PC++));
-    uint8_t& reg2=DecodeRegister(*this,memory.read(PC++));
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
     alu._add_(reg1,reg2,FLAGS);
 }
 void ControlUnit::SubRegs(){
-    uint8_t& reg1=DecodeRegister(*this,memory.read(PC++));
-    uint8_t& reg2=DecodeRegister(*this,memory.read(PC++));
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
     alu._sub_(reg1,reg2,FLAGS);
 }
+void ControlUnit::MulRegs(){
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
+    alu._mul_(reg1,reg2,FLAGS);
+}
+void ControlUnit::AddCRegs(){
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
+    alu._addc_(reg1,reg2,FLAGS);
+}
+void ControlUnit::XORRegs(){
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
+    alu._xor_(reg1,reg2,FLAGS);
+}
+void ControlUnit::ANDRegs(){
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
+    alu._and_(reg1,reg2,FLAGS);
+}
+void ControlUnit::ORRegs(){
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
+    alu._or_(reg1,reg2,FLAGS);
+}
+void ControlUnit::INCReg(){
+    uint8_t& reg=DecodeRegister(*this,get_next_arg());
+    alu._inc_(reg,FLAGS);
+}
+void ControlUnit::DECReg(){
+    uint8_t& reg=DecodeRegister(*this,get_next_arg());
+    alu._dec_(reg,FLAGS);
+}
 void ControlUnit::CmpRegs(){
-    uint8_t& reg1=DecodeRegister(*this,memory.read(PC++));
-    uint8_t& reg2=DecodeRegister(*this,memory.read(PC++));
+    uint8_t& reg1=DecodeRegister(*this,get_next_arg());
+    uint8_t& reg2=DecodeRegister(*this,get_next_arg());
     alu._cmp_(reg1,reg2,FLAGS);
 }
 
 void ControlUnit::Jump(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     std::cout<<"\nJUMP ADDRESS "<<ByteConcat(upper,lower)<<std::flush;
     PC=ByteConcat(upper,lower);
-
 }
 void ControlUnit::Jump_zero(){
-    if((FLAGS&1)==1){
+    if(GetZeroFlag(FLAGS)==1){
         Jump();
     }else{
         PC+=2;
     }
 }
 void ControlUnit::Jump_nonzero(){
-    if((FLAGS&(1))!=1){
+    if(GetZeroFlag(FLAGS)!=1){
         Jump();
     }else{
         PC+=2;
     }
 }
 void ControlUnit::Jump_Less(){
-    if(((FLAGS>>1)&(1))==1 && ((FLAGS)&(1))==0){
+    if(GetCarryFlag(FLAGS)==1 && GetZeroFlag(FLAGS)==0){
         Jump();
     }else{
         PC+=2;
     }
 }
 void ControlUnit::Jump_LessEqual(){
-    if(((FLAGS>>1)&(1))==1){
+    if(GetCarryFlag(FLAGS)==1){
         Jump();
     }else{
         PC+=2;
     }
 }
 void ControlUnit::Jump_Greater(){
-    if(((FLAGS>>1)&(1))==0 && ((FLAGS)&(1))==0){
+    if(GetCarryFlag(FLAGS)==0 && GetZeroFlag(FLAGS)==0){
         Jump();
     }else{
         PC+=2;
     }
 }
 void ControlUnit::Jump_GreaterEqual(){
-    if(((FLAGS>>1)&(1))==0){
+    if(GetCarryFlag(FLAGS)==0){
         Jump();
     }else{
         PC+=2;
@@ -230,4 +281,3 @@ void ControlUnit::str_d_to_address(){
     uint16_t address=ByteConcat(upper,lower);
     memory.write(address,D);
 }
-        

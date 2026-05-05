@@ -8,7 +8,7 @@
 #include "../include/Main.h"
 int main(){
 
-    ControlUnit cu(20,true);
+    ControlUnit cu(100,true);
     //Example program
     // start:
     // ldi A,5
@@ -24,14 +24,14 @@ int main(){
     // jmp 0x0000
     cu.LoadProgram({
         _LDI,_A,5,
-        _LDI,_B,1,
         _LDI,_C,26,
-        _ADD,_A,_B,
+        _INC,_A,
         _CMP,_A,_C,
-        _JLE,0x00,0x09,
+        _JLE,0x00,0x06,
         _LB_B,0xFF,0xFF,
         _ADD,_A,_B,
         _STR_A,0xFF,0xFF,
+        _XOR,_B,_B,
         _JMP,0x00,0x00
     });
 
