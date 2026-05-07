@@ -5,6 +5,9 @@ namespace Instruction{
     constexpr uint8_t _LB_B=0X01; 
     constexpr uint8_t _LB_C=0X02; 
     constexpr uint8_t _LB_D=0X03; 
+    constexpr uint8_t _LB_X=0X1F; 
+    constexpr uint8_t _LB_Y=0X20; 
+
     constexpr uint8_t _LDI=0X04; 
     constexpr uint8_t _CPY=0X05; 
     constexpr uint8_t _ADD=0X06; 
@@ -24,10 +27,18 @@ namespace Instruction{
     constexpr uint8_t _JG=0X14; 
     constexpr uint8_t _JLE=0X15; 
     constexpr uint8_t _JGE=0X16; 
+    
     constexpr uint8_t _STRI_A=0X17; 
     constexpr uint8_t _STRI_B=0X18; 
     constexpr uint8_t _STRI_C=0X19; 
     constexpr uint8_t _STRI_D=0X1A; 
+    constexpr uint8_t _STRI_X=0X21; 
+    constexpr uint8_t _STRI_Y=0X22;
+
     constexpr uint8_t _STR_AB=0X1B; 
     constexpr uint8_t _STR_CD=0X1C; 
+    constexpr uint8_t _STR_XY=0X23;
+
+    constexpr uint8_t _PUSH=0X1D; 
+    constexpr uint8_t _POP=0X1E; 
 };

@@ -23,6 +23,12 @@ uint8_t& DecodeRegister(ControlUnit& obj,uint8_t encoded_value){
     case _Register8::_D:
         return obj.CD.high;
         break;
+    case _Register8::_X:
+        return obj.XY.low;
+        break;
+    case _Register8::_Y:
+        return obj.XY.high;
+        break;
     }
     throw std::runtime_error("Cannot decode value !"+std::to_string(encoded_value));  
 }

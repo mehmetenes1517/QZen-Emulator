@@ -10,9 +10,9 @@ void Memory::Display() const{
      std::cout<<"\n\t\tMemory\t\t\n";
      std::cout<<"\n*************************************************\n";
      for(size_t i=0;i<data.max_size();i++){
-         if(i%4==0){
+         if(i%(0x0fff)==0){
              std::cout<<"\n";
          }
-         std::cout<<std::setw(6)<<" 0x"<<std::hex<<int(data[i]);
+         std::cout<<std::setw(2)<<" "<<std::hex<<int(data[i]);
      }
  }

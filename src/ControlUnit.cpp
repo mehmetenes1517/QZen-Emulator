@@ -5,8 +5,10 @@ ControlUnit::ControlUnit(float frequency,bool debug_on):frequency_hz(frequency),
     Restart();
 }
 void ControlUnit::Restart(){
-    AB=CD={0x0000};
+    AB=CD=XY={0x0000};
     PC={0X0000};
+    BP={0x71CD};
+    SP={0x71CD};
     ResetFlags(FLAGS);
     memory.data.fill(0x00);
 }
@@ -32,6 +34,12 @@ void ControlUnit::Decode_Execute(uint8_t command){
             break;
         }case Instruction::_LB_D:{
             ld_d_from_address();
+            break;
+        }case Instruction::_LB_X:{
+            ld_x_from_address();
+            break;
+        }case Instruction::_LB_Y:{
+            ld_y_from_address();
             break;
         }case Instruction::_LDI:{
             immediate_load();
@@ -108,6 +116,15 @@ void ControlUnit::Decode_Execute(uint8_t command){
         }case Instruction::_STR_CD:{
             str_cd();
             break;
+        }case Instruction::_STR_XY:{
+            str_xy();
+            break;
+        }case Instruction::_PUSH:{
+            Push_Register();
+            break;
+        }case Instruction::_POP:{
+            Pop_Register();
+            break;
         }
         default:{
             break;
@@ -152,7 +169,18 @@ void ControlUnit::ld_d_from_address(){
     uint8_t lower=get_next_arg();
     CD.high=memory.read(ByteConcat(upper,lower));
 
+}void ControlUnit::ld_x_from_address(){
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
+    XY.low=memory.read(ByteConcat(upper,lower));
+
+}void ControlUnit::ld_y_from_address(){
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
+    XY.high=memory.read(ByteConcat(upper,lower));
+
 }
+
 void ControlUnit::immediate_load(){
     uint8_t& reg=DecodeRegister(*this,get_next_arg());
     uint8_t value=get_next_arg();
@@ -220,7 +248,9 @@ void ControlUnit::CmpRegs(){
 void ControlUnit::Jump(){
     uint8_t upper=get_next_arg();
     uint8_t lower=get_next_arg();
-    std::cout<<"\nJUMP ADDRESS "<<ByteConcat(upper,lower)<<std::flush;
+    if(debugmode){
+        std::cout<<"\nJUMP ADDRESS "<<ByteConcat(upper,lower)<<std::flush;
+    }
     PC.value=ByteConcat(upper,lower);
 }
 void ControlUnit::Jump_zero(){
@@ -298,4 +328,19 @@ void ControlUnit::str_ab(){
     uint8_t& reg=DecodeRegister(*this,get_next_arg());
     PC.value++; //FOR ALIGNMENT
     memory.write(AB.value,reg);
+}
+void ControlUnit::str_xy(){
+    uint8_t& reg=DecodeRegister(*this,get_next_arg());
+    PC.value++; //FOR ALIGNMENT
+    memory.write(XY.value,reg);
+}
+void ControlUnit::Push_Register(){
+    uint8_t &reg=DecodeRegister(*this,get_next_arg());
+    PC.value++; //FOR ALIGNMENT
+    memory.write(SP.value--,reg);
+}
+void ControlUnit::Pop_Register(){
+    uint8_t &reg=DecodeRegister(*this,get_next_arg());
+    PC.value++; //FOR ALIGNMENT
+    reg=memory.read(++SP.value);
 }

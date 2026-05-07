@@ -24,6 +24,16 @@ else()
     target_link_libraries(GPUVisualizer QZenLib raylib)
 endif()
 
+add_executable(FramebufferVisualizer ${CMAKE_SOURCE_DIR}/Examples/framebuffer.cpp)
+if(LINUX)
+    target_link_libraries(FramebufferVisualizer QZenLib raylib X11)
+else()
+    target_link_libraries(FramebufferVisualizer QZenLib raylib)
+endif()
+
+
+
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin/tests/ALU/)
 add_executable(ALUUnitTests ${CMAKE_SOURCE_DIR}/tests/ALU/alu_tests.cpp)
 target_link_libraries(ALUUnitTests QZenLib)

@@ -232,6 +232,12 @@ std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebu
             else if(register_code==_Register8::_D){
                 code.push_back(Instruction::_STRI_D);
             }
+            else if(register_code==_Register8::_X){
+                code.push_back(Instruction::_STRI_X);
+            }
+            else if(register_code==_Register8::_Y){
+                code.push_back(Instruction::_STRI_Y);
+            }
             code.push_back(address.high);
             code.push_back(address.low);
         }
@@ -245,7 +251,22 @@ std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebu
             if(register16_code==_Register16::_CD){
                 code.push_back(Instruction::_STR_CD);
             }
+            if(register16_code==_Register16::_XY){
+                code.push_back(Instruction::_STR_XY);
+            }
             code.push_back(register8_code);
+            code.push_back(0xff);
+        }
+        else if(tokens[i]=="push"){
+            uint8_t reg=Register8FromToken(tokens[++i]);
+            code.push_back(Instruction::_PUSH);
+            code.push_back(reg);
+            code.push_back(0xff);
+        }
+        else if(tokens[i]=="pop"){
+            uint8_t reg=Register8FromToken(tokens[++i]);
+            code.push_back(Instruction::_POP);
+            code.push_back(reg);
             code.push_back(0xff);
         }
         else{
@@ -260,6 +281,8 @@ uint8_t  Register8FromToken(const std::string& token){
     else if (token_lower=="b"){return _Register8::_B;}
     else if (token_lower=="c"){return _Register8::_C;}
     else if (token_lower=="d"){return _Register8::_D;}
+    else if (token_lower=="x"){return _Register8::_X;}
+    else if (token_lower=="y"){return _Register8::_Y;}
 
     throw std::runtime_error("Invalid Argument! "+token);
 }
@@ -267,6 +290,7 @@ uint8_t  Register16FromToken(const std::string& token){
     std::string token_lower=String::ToLower(token);
     if      (token_lower=="ab"){return _Register16::_AB;}
     else if (token_lower=="cd"){return _Register16::_CD;}
+    else if (token_lower=="xy"){return _Register16::_XY;}
     else if (token_lower=="pc"){throw std::runtime_error("Invalid Argument! Program counter cannot be used as memory store");}
     throw std::runtime_error("Invalid Argument! "+token);
 }

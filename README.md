@@ -42,37 +42,41 @@ PC | 16 bit | Program counter | 0x07
 ### Instruction Set
 ---------------------------------------------------------------------------------------------
 
-Instruction | Purpose | Machine Code Macro | Instruction sequence size
---- | --- | --- | ---
-0x00 | load memory to A register | _LB_A | 3 
-0x01 | load memory to B register | _LB_B | 3
-0x02 | load memory to C register | _LB_C | 3
-0x03 | load memory to D register | _LB_D | 3
-0x04 | immediate mode load to registers | _LDI | 3
-0x05 | copy register to another | _CPY | 3 
-0x06 | add registers | _ADD | 3
-0x07 | subtract registers | _SUB | 3
-0x08 | multiply registers | _MUL | 3
-0x09 | add registers with carry | _ADDC | 3
-0x0A | xor bitwise operation between registers | _XOR | 3 
-0x0B | and bitwise operation between registers | _AND | 3
-0x0C | or bitwise operation between registers | _OR | 3
-0x0D | increase register by 1 | _INC | 2
-0x0E | decrease register by 1 | _DEC | 2
-0x0F | comparison between registers | _CMP | 3
-0x10| unconditional jump | _JMP | 3
-0x11 | jump if zero flag is 1 | _JZ | 3
-0x12 | jump if zero flag is not 1 | _JNZ | 3
-0x13 | jump if zf==0 and signf==1 | _JL | 3
-0x14 | jump if zf==0 and signf==0 | _JG | 3
-0x15 | jump if signf==1 | _JLE | 3
-0x16 | jump if signf==0 | _JGE | 3
-0x17 | store A register to given 16bit memory address | _STRI_A | 3
-0x18 | store B register to given 16bit memory address | _STRI_B | 3
-0x19 | store C register to given 16bit memory address | _STRI_C | 3
-0x1A | store D register to given 16bit memory address | _STRI_D | 3
-0X1B | store given register's value as taking AB register's value as address | _STR_AB | 2 
-0X1C | store given register's value as taking CD register's value as address | _STR_CD | 2 
+Instruction | Purpose | Code Macro | Instruction sequence size | Assembly code
+--- | --- | --- | --- | ---
+0x00 | load memory to A register | _LB_A | 3 | lb
+0x01 | load memory to B register | _LB_B | 3 | lb
+0x02 | load memory to C register | _LB_C | 3 | lb
+0x03 | load memory to D register | _LB_D | 3 | lb
+0x04 | immediate mode load to registers | _LDI | 3 | ldi
+0x05 | copy register to another | _CPY | 3  | cpy
+0x06 | add registers | _ADD | 3 | add
+0x07 | subtract registers | _SUB | 3 | sub
+0x08 | multiply registers | _MUL | 3 | mul
+0x09 | add registers with carry | _ADDC | 3 | addc
+0x0A | xor bitwise operation between registers | _XOR | 3 | xor
+0x0B | and bitwise operation between registers | _AND | 3 | and
+0x0C | or bitwise operation between registers | _OR | 3 | or
+0x0D | increase register by 1 | _INC | 2 | inc
+0x0E | decrease register by 1 | _DEC | 2 | dec
+0x0F | comparison between registers | _CMP | 3 | cmp
+0x10| unconditional jump | _JMP | 3 | jmp
+0x11 | jump if zero flag is 1 | _JZ | 3 | jz
+0x12 | jump if zero flag is not 1 | _JNZ | 3 | jnz
+0x13 | jump if zf==0 and signf==1 | _JL | 3 | jl
+0x14 | jump if zf==0 and signf==0 | _JG | 3 | jg
+0x15 | jump if signf==1 | _JLE | 3 | jle
+0x16 | jump if signf==0 | _JGE | 3 | jge
+0x17 | store A register to given 16bit memory address | _STRI_A | 3 | stri
+0x18 | store B register to given 16bit memory address | _STRI_B | 3 | stri
+0x19 | store C register to given 16bit memory address | _STRI_C | 3 | stri
+0x1A | store D register to given 16bit memory address | _STRI_D | 3 | stri
+0X1B | store given register's value as taking AB register's value as address | _STR_AB | 2 | str
+0X1C | store given register's value as taking CD register's value as address | _STR_CD | 2 | str
+0X1D | push given register's value to stack | _PUSH | 2 | push
+0X1E | pop from stack to a register | _POP | 2 | pop
+
+
 
 
 
@@ -99,4 +103,18 @@ we load our program to 0x00 address
 #### **THIS SECTION IS NOT IMPLEMENTED YET**
 
 - I decided to make an 280x130 framebuffer in specific memory address interval
+
+0xFFFF -> control bit
+
+0XFFFE-> fb end 
+0x71CE-> fb start
+
+0x71CD-> base pointer
+0x71CC-> stack pointer
+
+0x0000-> program entry point
+
+
+
+
 
