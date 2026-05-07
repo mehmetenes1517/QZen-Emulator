@@ -50,7 +50,10 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
         //labels
         if(tokens[i].back()==':'){
             tokens[i].pop_back();
-            address_table[tokens[i]]=i;
+            address_table[tokens[i]]=(i==0)?(0):(i-1);
+            if(opendebug){
+                std::cout<<"\nLabel Address : "<<std::hex<<int(address_table[tokens[i]])<<std::flush;
+            }
         }
         //indirect load "lb A,[0xffff]" 
         else if(tokens[i]=="lb"){
@@ -75,13 +78,15 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(src.high);          
             code.push_back(src.low);          
         }
+        //immidiate load "lb A,0xffff" 
         else if(tokens[i]=="ldi"){
             uint8_t register_arg=Register8FromToken(tokens[++i]);
-            Register16 value=AddressFromToken(tokens[++i]);
+            Register16 value=ValueFromToken(tokens[++i]);
             code.push_back(Instruction::_LDI);
             code.push_back(register_arg);
             code.push_back(value.low);
         }
+        //register copy "cpy A,B" 
         else if(tokens[i]=="cpy"){
             uint8_t register_arg1=Register8FromToken(tokens[++i]);
             uint8_t register_arg2=Register8FromToken(tokens[++i]);
@@ -89,6 +94,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(register_arg1);
             code.push_back(register_arg2);
         }
+        //unconditional jump "jmp label" 
         else if(tokens[i]=="jmp"){
             std::string label=(tokens[++i]);
             Register16 address={address_table[label]};
@@ -96,6 +102,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(address.high);
             code.push_back(address.low);
         }
+        //add regs "add A,B" 
         else if(tokens[i]=="add"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             uint8_t reg2=Register8FromToken(tokens[++i]);
@@ -103,6 +110,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(reg1);
             code.push_back(reg2);
         }
+        //subtract regs "sub A,B" 
         else if(tokens[i]=="sub"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             uint8_t reg2=Register8FromToken(tokens[++i]);
@@ -110,6 +118,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(reg1);
             code.push_back(reg2);
         }
+        //multiply regs "mul A,B" 
         else if(tokens[i]=="mul"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             uint8_t reg2=Register8FromToken(tokens[++i]);
@@ -117,6 +126,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(reg1);
             code.push_back(reg2);
         }
+        //add with carry regs "addc A,B" 
         else if(tokens[i]=="addc"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             uint8_t reg2=Register8FromToken(tokens[++i]);
@@ -124,6 +134,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(reg1);
             code.push_back(reg2);
         }
+        //xor regs "xor A,B" 
         else if(tokens[i]=="xor"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             uint8_t reg2=Register8FromToken(tokens[++i]);
@@ -131,6 +142,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(reg1);
             code.push_back(reg2);
         }
+        //and regs "and A,B" 
         else if(tokens[i]=="and"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             uint8_t reg2=Register8FromToken(tokens[++i]);
@@ -138,6 +150,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(reg1);
             code.push_back(reg2);
         }
+        //or regs "and A,B" 
         else if(tokens[i]=="or"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             uint8_t reg2=Register8FromToken(tokens[++i]);
@@ -145,16 +158,27 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(reg1);
             code.push_back(reg2);
         }
+        //increment by 1 "inc A" 
         else if(tokens[i]=="inc"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             code.push_back(Instruction::_INC);
             code.push_back(reg1);
         }
+        //decrement by 1 "dec A" 
         else if(tokens[i]=="dec"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             code.push_back(Instruction::_DEC);
             code.push_back(reg1);
         }
+        //compare regs "cmp A,B" 
+        else if(tokens[i]=="cmp"){
+            uint8_t reg1=Register8FromToken(tokens[++i]);
+            uint8_t reg2=Register8FromToken(tokens[++i]);
+            code.push_back(Instruction::_CMP);
+            code.push_back(reg1);
+            code.push_back(reg2);
+        }
+        //jump if zero "jz label" 
         else if(tokens[i]=="jz"){
             std::string token=tokens[++i];
             Value16 address={address_table[token]};
@@ -163,6 +187,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(address.low);
 
         }
+        //jump if not zero "jnz label" 
         else if(tokens[i]=="jnz"){
             std::string token=tokens[++i];
             Value16 address={address_table[token]};
@@ -170,6 +195,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(address.high);
             code.push_back(address.low);
         }
+        //jump if less "jl label" 
         else if(tokens[i]=="jl"){
             std::string token=tokens[++i];
             Value16 address={address_table[token]};
@@ -177,6 +203,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(address.high);
             code.push_back(address.low);
         }
+        //jump if greater "jg label" 
         else if(tokens[i]=="jg"){
             std::string token=tokens[++i];
             Value16 address={address_table[token]};
@@ -184,6 +211,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(address.high);
             code.push_back(address.low);
         }
+        //jump if less equal "jle label" 
         else if(tokens[i]=="jle"){
             std::string token=tokens[++i];
             Value16 address={address_table[token]};
@@ -191,6 +219,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(address.high);
             code.push_back(address.low);
         }
+        //jump if greater or equal "jge label" 
         else if(tokens[i]=="jge"){
             std::string token=tokens[++i];
             Value16 address={address_table[token]};
@@ -198,6 +227,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(address.high);
             code.push_back(address.low);
         }
+        //store from given immediate address "str [0xfffe],A" 
         else if(tokens[i]=="stri"){
             Value16 address={AddressFromToken(tokens[++i])};
             uint8_t register_code=Register8FromToken(tokens[++i]);
@@ -216,6 +246,7 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
             code.push_back(address.high);
             code.push_back(address.low);
         }
+        //store to "str [0xfffe],A" 
         else if(tokens[i]=="str"){
             uint8_t register16_code=Register16FromToken(tokens[++i]);
             uint8_t register8_code=Register8FromToken(tokens[++i]);

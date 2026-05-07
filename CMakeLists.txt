@@ -30,5 +30,5 @@ target_link_libraries(ALUUnitTests QZenLib)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin/tests/Assembler/)
 add_executable(AssemblerTests ${CMAKE_SOURCE_DIR}/tests/Assembler/assembler_tests.cpp)
-target_link_libraries(AssemblerTests QZenLib)
+target_link_libraries(AssemblerTests QZenLib raylib X11)
 configure_file(${CMAKE_SOURCE_DIR}/tests/Assembler/main.s ${CMAKE_SOURCE_DIR}/Bin/tests/Assembler/main.s)

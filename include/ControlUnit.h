@@ -21,10 +21,8 @@ struct ControlUnit{
         void str_b_to_immediate_address();
         void str_c_to_immediate_address();
         void str_d_to_immediate_address();
-        void str_a_to_cd();
-        void str_b_to_cd();
-        void str_c_to_ab();
-        void str_d_to_ab();
+        void str_cd();
+        void str_ab();
         void immediate_load();
         void copy_register();
         void Jump();

@@ -7,3 +7,5 @@
 std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug);
 uint8_t Register8FromToken(const std::string& token);
 Register16 AddressFromToken(const std::string& token);
+uint8_t  Register16FromToken(const std::string& token);
+Register16 ValueFromToken(const std::string& token);
