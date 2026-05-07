@@ -82,9 +82,13 @@ Instruction | Purpose | Machine Code Macro | Instruction sequence size
 
  - it stores the 8-bit value inside of the A register to 0xffff address
 
-    0x0d , 0x00
+    0x0d , 0x00 , 0xff
 
  - it increases A register by 1
+
+**Important Note :**
+ - In 2 byte instructions , you should align the instruction sequence to 3 bytes with padding it with <code>0xff</code>
+
 
 --------------------------------------------------------------------------------------------- 
 

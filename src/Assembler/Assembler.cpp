@@ -150,12 +150,14 @@ std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebu
             uint8_t reg1=Register8FromToken(tokens[++i]);
             code.push_back(Instruction::_INC);
             code.push_back(reg1);
+            code.push_back(0xff);
         }
         //decrement by 1 "dec A" 
         else if(tokens[i]=="dec"){
             uint8_t reg1=Register8FromToken(tokens[++i]);
             code.push_back(Instruction::_DEC);
             code.push_back(reg1);
+            code.push_back(0xff);
         }
         //compare regs "cmp A,B" 
         else if(tokens[i]=="cmp"){
@@ -244,6 +246,7 @@ std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebu
                 code.push_back(Instruction::_STR_CD);
             }
             code.push_back(register8_code);
+            code.push_back(0xff);
         }
         else{
             throw std::runtime_error("Invalid Instruction! "+ tokens[i]);

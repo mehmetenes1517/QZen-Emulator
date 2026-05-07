@@ -203,10 +203,12 @@ void ControlUnit::ORRegs(){
 }
 void ControlUnit::INCReg(){
     uint8_t& reg=DecodeRegister(*this,get_next_arg());
+    PC.value++; //FOR ALIGNMENT
     alu._inc_(reg,FLAGS);
 }
 void ControlUnit::DECReg(){
     uint8_t& reg=DecodeRegister(*this,get_next_arg());
+    PC.value++; //FOR ALIGNMENT
     alu._dec_(reg,FLAGS);
 }
 void ControlUnit::CmpRegs(){
@@ -264,34 +266,36 @@ void ControlUnit::Jump_GreaterEqual(){
     }
 }
 void ControlUnit::str_a_to_immediate_address(){
-    uint8_t upper=memory.read(PC.value++);
-    uint8_t lower=memory.read(PC.value++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     uint16_t address=ByteConcat(upper,lower);
     memory.write(address,AB.low);
 }
 void ControlUnit::str_b_to_immediate_address(){
-    uint8_t upper=memory.read(PC.value++);
-    uint8_t lower=memory.read(PC.value++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     uint16_t address=ByteConcat(upper,lower);
     memory.write(address,AB.high);
 }
 void ControlUnit::str_c_to_immediate_address(){
-    uint8_t upper=memory.read(PC.value++);
-    uint8_t lower=memory.read(PC.value++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     uint16_t address=ByteConcat(upper,lower);
     memory.write(address,CD.low);
 }
 void ControlUnit::str_d_to_immediate_address(){
-    uint8_t upper=memory.read(PC.value++);
-    uint8_t lower=memory.read(PC.value++);
+    uint8_t upper=get_next_arg();
+    uint8_t lower=get_next_arg();
     uint16_t address=ByteConcat(upper,lower);
     memory.write(address,CD.high);
 }
 void ControlUnit::str_cd(){
-    uint8_t& reg=DecodeRegister(*this,memory.read(PC.value++));
+    uint8_t& reg=DecodeRegister(*this,get_next_arg());
+    PC.value++; //FOR ALIGNMENT
     memory.write(CD.value,reg);
 }
 void ControlUnit::str_ab(){
-    uint8_t& reg=DecodeRegister(*this,memory.read(PC.value++));
+    uint8_t& reg=DecodeRegister(*this,get_next_arg());
+    PC.value++; //FOR ALIGNMENT
     memory.write(AB.value,reg);
 }

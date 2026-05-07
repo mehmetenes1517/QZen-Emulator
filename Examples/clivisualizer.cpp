@@ -19,7 +19,7 @@ int main(){
             add A,B
             stri [0xffff], A
             jmp start
-        )",false);
+        )");
     ControlUnit cu(100,true);
     //Example program
     //start:
@@ -65,7 +65,7 @@ int main(){
     
     
     
-
-
+    
+    
     return 0;
 }
