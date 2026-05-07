@@ -28,7 +28,7 @@ int main(){
         _JLE,0x00,0x06,
         _LB_B,0xFF,0xFF,
         _ADD,_A,_B,
-        _STR_A,0xFF,0xFF,
+        _STRI_A,0xFF,0xFF,
         _XOR,_B,_B,
         _JMP,0x00,0x00
     });
@@ -44,16 +44,16 @@ int main(){
         ss.clear();
         ss<<"\033[H";
         ss<<std::setw(60)<<"\033[33m********************************************\n";
-        ss<<std::setw(60)<<("\n\033[32mA : ")<<int(cu.A);
-        ss<<std::setw(60)<<("\n\033[32mB : ")<<int(cu.B);
-        ss<<std::setw(60)<<("\n\033[32mC : ")<<int(cu.C);
-        ss<<std::setw(60)<<("\n\033[32mD : ")<<int(cu.D);
+        ss<<std::setw(60)<<("\n\033[32mA : ")<<int(cu.AB.low);
+        ss<<std::setw(60)<<("\n\033[32mB : ")<<int(cu.AB.high);
+        ss<<std::setw(60)<<("\n\033[32mC : ")<<int(cu.CD.low);
+        ss<<std::setw(60)<<("\n\033[32mD : ")<<int(cu.CD.high);
         ss<<std::setw(60)<<("\n\033[34mMemory 0xffff : ")<<(int(cu.memory.data[0xffff]));
         ss<<std::setw(60)<<("\n\033[34mMemory 0xfffe : ")<<(int(cu.memory.data[0xfffe]));
         ss<<std::setw(60)<<("\n\033[34mMemory 0xfffd : ")<<(int(cu.memory.data[0xfffd]));
         ss<<std::setw(60)<<("\n\033[34mMemory 0xfffc : ")<<(int(cu.memory.data[0xfffc]));
         ss<<std::setw(60)<<("\n\033[31mFlags : ")<<int(cu.FLAGS);
-        ss<<std::setw(60)<<("\n\033[31mProgram Counter : ")<<int(cu.PC);
+        ss<<std::setw(60)<<("\n\033[31mProgram Counter : ")<<int(cu.PC.value);
         ss<<std::setw(60)<<"\n\033[33m*****************************************\n\033[0m";
         ss<<std::flush;
         std::cout<<ss.str();

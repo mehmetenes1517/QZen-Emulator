@@ -30,7 +30,7 @@ int main(){
         _JLE,0x00,0x06,
         _LB_B,0xFF,0xFF,
         _ADD,_A,_B,
-        _STR_A,0xFF,0xFF,
+        _STRI_A,0xFF,0xFF,
         _XOR,_B,_B,
         _JMP,0x00,0x00
     });
@@ -45,16 +45,16 @@ int main(){
         BeginDrawing();
             ClearBackground(WHITE);
 
-            DrawText(std::string("A : "+std::to_string(cu.A)).c_str(),10, 0, 24, BLACK);
-            DrawText(std::string("B : "+std::to_string(cu.B)).c_str(),10, 20, 24, BLACK);
-            DrawText(std::string("C : "+std::to_string(cu.C)).c_str(),10, 40, 24, BLACK);
-            DrawText(std::string("D : "+std::to_string(cu.D)).c_str(),10, 60, 24, BLACK);
+            DrawText(std::string("A : "+std::to_string(cu.AB.low)).c_str(),10, 0, 24, BLACK);
+            DrawText(std::string("B : "+std::to_string(cu.AB.high)).c_str(),10, 20, 24, BLACK);
+            DrawText(std::string("C : "+std::to_string(cu.CD.low)).c_str(),10, 40, 24, BLACK);
+            DrawText(std::string("D : "+std::to_string(cu.CD.high)).c_str(),10, 60, 24, BLACK);
             DrawText(std::string("Memory 0xffff : "+std::to_string(cu.memory.data[0xffff])).c_str(),10, 80, 24, BLACK);
             DrawText(std::string("Memory 0xfffe : "+std::to_string(cu.memory.data[0xfffe])).c_str(),10, 100, 24, BLACK);
             DrawText(std::string("Memory 0xfffd : "+std::to_string(cu.memory.data[0xfffd])).c_str(),10, 120, 24, BLACK);
             DrawText(std::string("Memory 0xfffc : "+std::to_string(cu.memory.data[0xfffc])).c_str(),10, 140, 24, BLACK);
             DrawText(std::string("Flags : "+std::to_string(cu.FLAGS)).c_str(),10, 160, 24, BLACK);
-            DrawText(std::string("Program Counter : "+std::to_string(cu.PC)).c_str(),10, 180, 24, BLACK);
+            DrawText(std::string("Program Counter : "+std::to_string(cu.PC.value)).c_str(),10, 180, 24, BLACK);
 
 
         EndDrawing();

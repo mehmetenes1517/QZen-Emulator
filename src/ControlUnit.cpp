@@ -5,8 +5,8 @@ ControlUnit::ControlUnit(float frequency,bool debug_on):frequency_hz(frequency),
     Restart();
 }
 void ControlUnit::Restart(){
-    A=B=C=D=0x00;
-    PC=0X0000;
+    AB=CD={0x0000};
+    PC={0X0000};
     ResetFlags(FLAGS);
     memory.data.fill(0x00);
 }
@@ -16,91 +16,97 @@ void ControlUnit::LoadProgram(const std::vector<uint8_t>& instructions){
     }
 }
 uint8_t ControlUnit::Fetch(){
-    return memory.data[PC++];
+    return memory.data[PC.value++];
 }
 void ControlUnit::Decode_Execute(uint8_t command){
     //COMMAND DECODE
     switch (command) {
-        case _LB_A:{
+        case Instruction::_LB_A:{
             ld_a_from_address();
             break;
-        }case _LB_B:{
+        }case Instruction::_LB_B:{
             ld_b_from_address();
             break;
-        }case _LB_C:{
+        }case Instruction::_LB_C:{
             ld_c_from_address();
             break;
-        }case _LB_D:{
+        }case Instruction::_LB_D:{
             ld_d_from_address();
             break;
-        }case _LDI:{
+        }case Instruction::_LDI:{
             immediate_load();
             break;
-        }case _CPY:{
+        }case Instruction::_CPY:{
             copy_register();
             break;
-        }case _ADD:{
+        }case Instruction::_ADD:{
             AddRegs();
             break;
-        }case _SUB:{
+        }case Instruction::_SUB:{
             SubRegs();
             break;
-        }case _MUL:{
+        }case Instruction::_MUL:{
             MulRegs();
             break;
-        }case _ADDC:{
+        }case Instruction::_ADDC:{
             AddCRegs();
             break;
-        }case _XOR:{
+        }case Instruction::_XOR:{
             XORRegs();
             break;
-        }case _AND:{
+        }case Instruction::_AND:{
             ANDRegs();
             break;
-        }case _OR:{
+        }case Instruction::_OR:{
             ORRegs();
             break;
-        }case _CMP:{
+        }case Instruction::_CMP:{
             CmpRegs();
             break;
-        }case _INC:{
+        }case Instruction::_INC:{
             INCReg();            
             break;
-        }case _DEC:{
+        }case Instruction::_DEC:{
             DECReg();
             break;
-        }case _JMP:{
+        }case Instruction::_JMP:{
             Jump();
             break;
-        }case _JZ:{
+        }case Instruction::_JZ:{
             Jump_zero();
             break;
-        }case _JNZ:{
+        }case Instruction::_JNZ:{
             Jump_nonzero();
             break;
-        }case _JL:{
+        }case Instruction::_JL:{
             Jump_Less();
             break;
-        }case _JG:{
+        }case Instruction::_JG:{
             Jump_Greater();
             break;
-        }case _JLE:{
+        }case Instruction::_JLE:{
             Jump_LessEqual();
             break;
-        }case _JGE:{
+        }case Instruction::_JGE:{
             Jump_GreaterEqual();
             break;
-        }case _STR_A:{
-            str_a_to_address();
+        }case Instruction::_STRI_A:{
+            str_a_to_immediate_address();
             break;
-        }case _STR_B:{
-            str_b_to_address();
+        }case Instruction::_STRI_B:{
+            str_b_to_immediate_address();
             break;
-        }case _STR_C:{
-            str_c_to_address();
+        }case Instruction::_STRI_C:{
+            str_c_to_immediate_address();
             break;
-        }case _STR_D:{
-            str_d_to_address();
+        }case Instruction::_STRI_D:{
+            str_d_to_immediate_address();
+            break;
+        }case Instruction::_STR_AB:{
+            str_ab();
+            break;
+        }case Instruction::_STR_CD:{
+            str_cd();
             break;
         }
         default:{
@@ -119,32 +125,32 @@ void ControlUnit::Run(){
         uint8_t command=Fetch();
         Decode_Execute(command);
         std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0f*(1.0f/frequency_hz))));
-        PC=PC%(0XFFFF+1);
+        PC.value=PC.value%(0XFFFF+1);
     }
 }
 uint8_t ControlUnit::get_next_arg(){
-    return memory.read(PC++);
+    return memory.read(PC.value++);
 }
 void ControlUnit::ld_a_from_address(){
     uint8_t upper=get_next_arg();
     uint8_t lower=get_next_arg();
-    A=memory.read(ByteConcat(upper,lower));
+    AB.low=memory.read(ByteConcat(upper,lower));
 }
 void ControlUnit::ld_b_from_address(){
     uint8_t upper=get_next_arg();
     uint8_t lower=get_next_arg();
-    B=memory.read(ByteConcat(upper,lower));
+    AB.high=memory.read(ByteConcat(upper,lower));
 }
 void ControlUnit::ld_c_from_address(){
     uint8_t upper=get_next_arg();
     uint8_t lower=get_next_arg();
-    C=memory.read(ByteConcat(upper,lower));
+    CD.low=memory.read(ByteConcat(upper,lower));
 
 }
 void ControlUnit::ld_d_from_address(){
     uint8_t upper=get_next_arg();
     uint8_t lower=get_next_arg();
-    D=memory.read(ByteConcat(upper,lower));
+    CD.high=memory.read(ByteConcat(upper,lower));
 
 }
 void ControlUnit::immediate_load(){
@@ -213,71 +219,79 @@ void ControlUnit::Jump(){
     uint8_t upper=get_next_arg();
     uint8_t lower=get_next_arg();
     std::cout<<"\nJUMP ADDRESS "<<ByteConcat(upper,lower)<<std::flush;
-    PC=ByteConcat(upper,lower);
+    PC.value=ByteConcat(upper,lower);
 }
 void ControlUnit::Jump_zero(){
     if(GetZeroFlag(FLAGS)==1){
         Jump();
     }else{
-        PC+=2;
+        PC.value+=2;
     }
 }
 void ControlUnit::Jump_nonzero(){
     if(GetZeroFlag(FLAGS)!=1){
         Jump();
     }else{
-        PC+=2;
+        PC.value+=2;
     }
 }
 void ControlUnit::Jump_Less(){
     if(GetCarryFlag(FLAGS)==1 && GetZeroFlag(FLAGS)==0){
         Jump();
     }else{
-        PC+=2;
+        PC.value+=2;
     }
 }
 void ControlUnit::Jump_LessEqual(){
     if(GetCarryFlag(FLAGS)==1){
         Jump();
     }else{
-        PC+=2;
+        PC.value+=2;
     }
 }
 void ControlUnit::Jump_Greater(){
     if(GetCarryFlag(FLAGS)==0 && GetZeroFlag(FLAGS)==0){
         Jump();
     }else{
-        PC+=2;
+        PC.value+=2;
     }
 }
 void ControlUnit::Jump_GreaterEqual(){
     if(GetCarryFlag(FLAGS)==0){
         Jump();
     }else{
-        PC+=2;
+        PC.value+=2;
     }
 }
-void ControlUnit::str_a_to_address(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+void ControlUnit::str_a_to_immediate_address(){
+    uint8_t upper=memory.read(PC.value++);
+    uint8_t lower=memory.read(PC.value++);
     uint16_t address=ByteConcat(upper,lower);
-    memory.write(address,A);
+    memory.write(address,AB.low);
 }
-void ControlUnit::str_b_to_address(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+void ControlUnit::str_b_to_immediate_address(){
+    uint8_t upper=memory.read(PC.value++);
+    uint8_t lower=memory.read(PC.value++);
     uint16_t address=ByteConcat(upper,lower);
-    memory.write(address,B);
+    memory.write(address,AB.high);
 }
-void ControlUnit::str_c_to_address(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+void ControlUnit::str_c_to_immediate_address(){
+    uint8_t upper=memory.read(PC.value++);
+    uint8_t lower=memory.read(PC.value++);
     uint16_t address=ByteConcat(upper,lower);
-    memory.write(address,C);
+    memory.write(address,CD.low);
 }
-void ControlUnit::str_d_to_address(){
-    uint8_t upper=memory.read(PC++);
-    uint8_t lower=memory.read(PC++);
+void ControlUnit::str_d_to_immediate_address(){
+    uint8_t upper=memory.read(PC.value++);
+    uint8_t lower=memory.read(PC.value++);
     uint16_t address=ByteConcat(upper,lower);
-    memory.write(address,D);
+    memory.write(address,CD.high);
+}
+void ControlUnit::str_cd(){
+    uint8_t& reg=DecodeRegister(*this,memory.read(PC.value++));
+    memory.write(CD.value,reg);
+}
+void ControlUnit::str_ab(){
+    uint8_t& reg=DecodeRegister(*this,memory.read(PC.value++));
+    memory.write(AB.value,reg);
 }

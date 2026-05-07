@@ -1,5 +1,6 @@
 #pragma once
 #include<cstdint>
+#include<iostream>
 class ControlUnit;
 uint16_t ByteConcat(uint8_t upper,uint8_t lower);
 uint8_t& DecodeRegister(ControlUnit& obj,uint8_t encoded_value);
@@ -13,3 +14,6 @@ void ResetZeroFlag(uint8_t& flag_register);
 void ResetSignFlag(uint8_t& flag_register);
 void ResetCarryFlag(uint8_t& flag_register);
 void ResetFlags(uint8_t& flag_register);
+namespace String{
+    std::string ToLower(const std::string& text);
+};

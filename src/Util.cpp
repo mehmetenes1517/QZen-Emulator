@@ -1,5 +1,6 @@
 #include"../include/Util.h"
 #include"../include/ControlUnit.h"
+#include"../include/Registers.h"
 uint16_t ByteConcat(uint8_t upper,uint8_t lower){
     uint16_t val=0x0000;
     val|=upper<<8;
@@ -9,23 +10,21 @@ uint16_t ByteConcat(uint8_t upper,uint8_t lower){
 uint8_t& DecodeRegister(ControlUnit& obj,uint8_t encoded_value){
     switch (encoded_value)
     {
-    case 0x00:
-        return obj.A;
+        
+    case _Register8::_A:
+        return obj.AB.low;
         break;
-    case 0x01:
-        return obj.B;
+    case _Register8::_B:
+        return obj.AB.high;
         break;
-    case 0x02:
-        return obj.C;
+    case _Register8::_C:
+        return obj.CD.low;
         break;
-    case 0x03:
-        return obj.D;
-        break;
-    case 0x04:
-        return obj.PC;
+    case _Register8::_D:
+        return obj.CD.high;
         break;
     }
-    return obj.FLAGS;  
+    throw std::runtime_error("Cannot decode value !"+std::to_string(encoded_value));  
 }
 
 uint8_t GetZeroFlag(uint8_t flag_register){return flag_register&1;}
@@ -38,3 +37,17 @@ void ResetZeroFlag(uint8_t& flag_register){ flag_register&= ~(1<<0);}
 void ResetSignFlag(uint8_t& flag_register){ flag_register&= ~(1<<1);}
 void ResetCarryFlag(uint8_t& flag_register){flag_register&= ~(1<<2);}
 void ResetFlags(uint8_t& flag_register){flag_register=0x00;}
+
+
+
+
+//string utility
+
+std::string String::ToLower(const std::string& text){
+    std::string lowertext;
+    lowertext.reserve(256);
+    for(const auto& c: text){
+        lowertext.push_back(std::tolower(c));
+    }
+    return lowertext;
+}

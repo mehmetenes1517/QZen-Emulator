@@ -10,6 +10,7 @@ set(LIB_SOURCE
     ${CMAKE_SOURCE_DIR}/src/LogicUnit.cpp
     ${CMAKE_SOURCE_DIR}/src/Memory.cpp
     ${CMAKE_SOURCE_DIR}/src/Util.cpp
+    ${CMAKE_SOURCE_DIR}/src/Assembler/Assembler.cpp
 )
 add_library(QZenLib ${LIB_SOURCE})
 
@@ -23,7 +24,11 @@ else()
     target_link_libraries(GPUVisualizer QZenLib raylib)
 endif()
 
-add_executable(ALUUnitTests ${CMAKE_SOURCE_DIR}/tests/alu_tests.cpp)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin/tests/ALU/)
+add_executable(ALUUnitTests ${CMAKE_SOURCE_DIR}/tests/ALU/alu_tests.cpp)
 target_link_libraries(ALUUnitTests QZenLib)
 
-
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Bin/tests/Assembler/)
+add_executable(AssemblerTests ${CMAKE_SOURCE_DIR}/tests/Assembler/assembler_tests.cpp)
+target_link_libraries(AssemblerTests QZenLib)
+configure_file(${CMAKE_SOURCE_DIR}/tests/Assembler/main.s ${CMAKE_SOURCE_DIR}/Bin/tests/Assembler/main.s)

@@ -1,5 +1,7 @@
-#include"../include/Main.h"
 #include<assert.h>
+#include<iostream>
+#include<cstdint>
+#include"../../include/Main.h"
 int main(){
     ALU alu;
     uint8_t flags=0x00;
