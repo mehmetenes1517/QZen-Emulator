@@ -9,7 +9,7 @@
 int main(){
 
 
-    ControlUnit cpu(100,false);
+    ControlUnit cpu(1000,false);
 
     const char* line_code=R"(
         start:
@@ -43,21 +43,22 @@ int main(){
 
     const char* test_code=R"(
         start:
-            ldi X,0xfd
-            ldi Y,0xff
-            ldi A,0xff
-            str XY,A
-            stri [0xeefe],A
-            stri [0xeeff],A
-            stri [0xef00],A
-            stri [0xef01],A
-            jmp start
-    
-    
+            ldi A,0x15
+            ldi B,0x10
+
+            jmp func1
+            func1_return:
+
+
+        halt:
+            jmp halt
+        func1:
+            add A,B
+            jmp func1_return
     )";
+    //its trying to replace func1 label and cant find it , its replacing not found label with 0x0000 
 
-
-    cpu.LoadProgram(AssembleText(line_code));
+    cpu.LoadProgram(AssembleText(test_code));
     auto thr=std::thread([&](){
         cpu.Run();
     });
