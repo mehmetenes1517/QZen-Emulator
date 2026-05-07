@@ -31,11 +31,12 @@ A | 8 bit | General Purpose | 0x00
 B | 8 bit | General Purpose | 0x01
 C | 8 bit | General Purpose | 0x02
 D | 8 bit | General Purpose | 0x03
-PC | 8 bit | Program counter | 0x04
-FLAGS | 8 bit | overflow, sign , zero bits | 0x05
+FLAGS | 8 bit | overflow, carry , zero bits | 0x04
+AB | 16 bit | Program counter | 0x05
+CD | 16 bit | Program counter | 0x06
+PC | 16 bit | Program counter | 0x07
 
 **Memory Size :** 64 kilo bytes
-
 
 
 ### Instruction Set
@@ -66,10 +67,12 @@ Instruction | Purpose | Machine Code Macro | Instruction sequence size
 0x14 | jump if zf==0 and signf==0 | _JG | 3
 0x15 | jump if signf==1 | _JLE | 3
 0x16 | jump if signf==0 | _JGE | 3
-0x17 | store A register to memory address | _STR_A | 3
-0x18 | store B register to memory address | _STR_B | 3
-0x19 | store C register to memory address | _STR_C | 3
-0x1A | store D register to memory address | _STR_D | 3
+0x17 | store A register to given 16bit memory address | _STRI_A | 3
+0x18 | store B register to given 16bit memory address | _STRI_B | 3
+0x19 | store C register to given 16bit memory address | _STRI_C | 3
+0x1A | store D register to given 16bit memory address | _STRI_D | 3
+0X1B | store given register's value as taking AB register's value as address | _STR_AB | 2 
+0X1C | store given register's value as taking CD register's value as address | _STR_CD | 2 
 
 
 
@@ -90,22 +93,6 @@ Instruction | Purpose | Machine Code Macro | Instruction sequence size
 we load our program to 0x00 address
 
 #### **THIS SECTION IS NOT IMPLEMENTED YET**
-  - I designed that cpu architecture as an embedded system thing. so it has mmio addresses which controls outside pins
 
-Address | Description
---- | ---
-0xFFFF | PINGROUP A
-0xFFFE | PINGROUP B
-0xFFFD | PINGROUP C
-0xFFFC | PINGROUP D
-
-Each address will control 8 pins etc... , its not decided yet.
-
-
-
-
-
-
-
-
+- I decided to make an 280x130 framebuffer in specific memory address interval
 

@@ -4,20 +4,7 @@
 #include"../../include/Util.h"
 #include<iostream>
 #include<unordered_map>
-std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=false){
-
-    //get contents
-    std::vector<char> file_content;
-    {
-        std::fstream file(filename, std::ios::in | std::ios::ate | std::ios::binary);
-        if(!file.is_open()) throw std::runtime_error("Cannot find file '"+filename+" ' ");
-        size_t size=(size_t)file.tellg();
-        file_content.resize(size);
-        file.seekg(0);
-        file.read(file_content.data(),size);
-        file.close();
-    }
-    
+std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebug){
 
     //tokenize it
     std::vector<std::string> tokens;
@@ -25,10 +12,10 @@ std::vector<uint8_t> AssembleText(const std::string& filename,bool opendebug=fal
     {
 
         std::string token;
-        for (size_t i = 0; i < file_content.size(); i++)
+        for (size_t i = 0; i < assembly_code.size(); i++)
         {
-            if( file_content[i]!=',' && file_content[i]!='\n' && !std::isspace(file_content[i])){
-                token.push_back(file_content[i]);
+            if( assembly_code[i]!=',' && assembly_code[i]!='\n' && !std::isspace(assembly_code[i])){
+                token.push_back(assembly_code[i]);
                 
             }else if(token.size()!=0){
                 tokens.push_back(token);

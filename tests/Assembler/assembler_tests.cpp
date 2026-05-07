@@ -3,24 +3,34 @@
 #include<raylib.h>
 int main(){
 
-    std::vector<uint8_t> code=AssembleText("main.s",false);
-    for(const auto& b:code){
-        std::cout<<"\n"<<std::hex<<int(b);
-    }
+    std::vector<uint8_t> code=AssembleText(R"(
+        start:
+            ldi A,0x05
+            ldi B,0x01
+            ldi C,0x1A
+        add11:
+            add A,B
+            cmp A,C
+            jnz add11
+            lb B,[0xffff]
+            add A,B
+            stri [0xffff], A
+            jmp start
+        )",false);
     ControlUnit cu(100,true);
     //Example program
-    // start:
-    // ldi A,5
-    // ldi B,1
-    // ldi C,26
-    // add:
-    // add A <- A+B
-    // cmp A,C
-    // jle add:
-    // lb B,[0xffff]
-    // add A,B
-    // str [0xffff], A
-    // jmp 0x0000
+    //start:
+    //    ldi A,0x05
+    //    ldi B,0x01
+    //    ldi C,0x1A
+    //add11:
+    //    add A,B
+    //    cmp A,C
+    //    jnz add11
+    //    lb B,[0xffff]
+    //    add A,B
+    //    stri [0xffff], A
+    //    jmp start
     cu.LoadProgram(code);
 
     auto thr=std::thread([&](){
@@ -28,25 +38,28 @@ int main(){
         cu.Run();
     });
     thr.detach();
-    InitWindow(800, 600, "CPU Visualizer");
-    while(!WindowShouldClose()){
-        BeginDrawing();
-            ClearBackground(WHITE);
-
-            DrawText(std::string("A : "+std::to_string(cu.AB.low)).c_str(),10, 0, 24, BLACK);
-            DrawText(std::string("B : "+std::to_string(cu.AB.high)).c_str(),10, 20, 24, BLACK);
-            DrawText(std::string("C : "+std::to_string(cu.CD.low)).c_str(),10, 40, 24, BLACK);
-            DrawText(std::string("D : "+std::to_string(cu.CD.high)).c_str(),10, 60, 24, BLACK);
-            DrawText(std::string("Memory 0xffff : "+std::to_string(cu.memory.data[0xffff])).c_str(),10, 80, 24, BLACK);
-            DrawText(std::string("Memory 0xfffe : "+std::to_string(cu.memory.data[0xfffe])).c_str(),10, 100, 24, BLACK);
-            DrawText(std::string("Memory 0xfffd : "+std::to_string(cu.memory.data[0xfffd])).c_str(),10, 120, 24, BLACK);
-            DrawText(std::string("Memory 0xfffc : "+std::to_string(cu.memory.data[0xfffc])).c_str(),10, 140, 24, BLACK);
-            DrawText(std::string("Flags : "+std::to_string(cu.FLAGS)).c_str(),10, 160, 24, BLACK);
-            DrawText(std::string("Program Counter : "+std::to_string(cu.PC.value)).c_str(),10, 180, 24, BLACK);
-
-
-        EndDrawing();
+    while (true)
+    {
+        static std::stringstream ss;
+        ss.str("");
+        ss.clear();
+        ss<<"\033[H";
+        ss<<std::setw(60)<<"\033[33m********************************************\n";
+        ss<<std::setw(60)<<("\n\033[32mA : ")<<int(cu.AB.low);
+        ss<<std::setw(60)<<("\n\033[32mB : ")<<int(cu.AB.high);
+        ss<<std::setw(60)<<("\n\033[32mC : ")<<int(cu.CD.low);
+        ss<<std::setw(60)<<("\n\033[32mD : ")<<int(cu.CD.high);
+        ss<<std::setw(60)<<("\n\033[34mMemory 0xffff : ")<<(int(cu.memory.data[0xffff]));
+        ss<<std::setw(60)<<("\n\033[34mMemory 0xfffe : ")<<(int(cu.memory.data[0xfffe]));
+        ss<<std::setw(60)<<("\n\033[34mMemory 0xfffd : ")<<(int(cu.memory.data[0xfffd]));
+        ss<<std::setw(60)<<("\n\033[34mMemory 0xfffc : ")<<(int(cu.memory.data[0xfffc]));
+        ss<<std::setw(60)<<("\n\033[31mFlags : ")<<int(cu.FLAGS);
+        ss<<std::setw(60)<<("\n\033[31mProgram Counter : ")<<int(cu.PC.value);
+        ss<<std::setw(60)<<"\n\033[33m*****************************************\n\033[0m";
+        ss<<std::flush;
+        std::cout<<ss.str();
     }
+    
 
     return 0;
 }

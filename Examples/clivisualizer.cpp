@@ -6,32 +6,36 @@
 #include "../include/Main.h"
 int main(){
 
-    ControlUnit cu(100,false);
+    std::vector<uint8_t> code=AssembleText(R"(
+        start:
+            ldi A,0x05
+            ldi B,0x01
+            ldi C,0x1A
+        add11:
+            add A,B
+            cmp A,C
+            jnz add11
+            lb B,[0xffff]
+            add A,B
+            stri [0xffff], A
+            jmp start
+        )",false);
+    ControlUnit cu(100,true);
     //Example program
-    // start:
-    // ldi A,5
-    // ldi C,26
-    // add:
-    // inc A 
-    // cmp A,C
-    // jle add:
-    // lb B,[0xffff]
-    // add A,B
-    // str [0xffff], A
-    // xor B,B
-    // jmp 0x0000
-    cu.LoadProgram({
-        _LDI,_A,5,
-        _LDI,_C,26,
-        _INC,_A,
-        _CMP,_A,_C,
-        _JLE,0x00,0x06,
-        _LB_B,0xFF,0xFF,
-        _ADD,_A,_B,
-        _STRI_A,0xFF,0xFF,
-        _XOR,_B,_B,
-        _JMP,0x00,0x00
-    });
+    //start:
+    //    ldi A,0x05
+    //    ldi B,0x01
+    //    ldi C,0x1A
+    //add11:
+    //    add A,B
+    //    cmp A,C
+    //    jnz add11
+    //    lb B,[0xffff]
+    //    add A,B
+    //    stri [0xffff], A
+    //    jmp start
+    cu.LoadProgram(code);
+
     auto thr=std::thread([&](){
         std::this_thread::sleep_for(std::chrono::seconds(1));
         cu.Run();
