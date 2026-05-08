@@ -84,11 +84,11 @@ Instruction | Purpose | Code Macro | Instruction sequence size | Assembly code
 
 **Example:**
 
-    0x14,0xff,0xff 
+        0x14,0xff,0xff 
 
  - it stores the 8-bit value inside of the A register to 0xffff address
 
-    0x0d,0x00,0xff
+        0x0d,0x00,0xff
 
  - it increases A register by 1
 
