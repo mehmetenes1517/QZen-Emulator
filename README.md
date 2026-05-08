@@ -3,11 +3,23 @@
 a 8-bit cpu architecture which i made up , it has 2 examples inside that visualizes registers, Framebuffer etc..
 
 
+
 -------------------------------------------------------------------------------------------
 
 **Examples/FrameBufferVisualizer** --> If you have raylib installed on your compiler , you can build it , its a framebuffer animation demo
 
 **Examples/CLIVisualizer** --> Portable cli of visualizer , there is no framebuffer, just registers
+
+-------------------------------------------------------------------------------------------
+
+Screenshots & Gifs
+
+<img width="1920" height="1080" alt="untitled" src="https://github.com/user-attachments/assets/864a33e0-b038-416e-9a69-13b49352ddfe" />
+
+
+<img width="419" height="223" alt="Screenshot From 2026-05-08 19-04-24" src="https://github.com/user-attachments/assets/2e860419-2a55-497a-9f5d-080ef1e2b19b" />
+
+<img width="727" height="667" alt="Pasted image" src="https://github.com/user-attachments/assets/20495e26-93d3-440d-b22e-8a4c5fd1b1f2" />
 
 -------------------------------------------------------------------------------------------
 
