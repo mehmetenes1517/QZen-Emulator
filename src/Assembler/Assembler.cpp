@@ -3,6 +3,7 @@
 #include"../../include/Instructions.h"
 #include"../../include/Util.h"
 #include<iostream>
+#include<format>
 #include<unordered_map>
 std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebug){
 
@@ -29,7 +30,34 @@ std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebu
 
     //lexer
     std::vector<uint8_t> code;
-    std::unordered_map<std::string,uint8_t> address_table;//address table for labels
+    std::unordered_map<std::string,uint16_t> address_table;//address table for labels
+
+    int16_t address=0x0000;
+    for(size_t i=0;i<tokens.size();i++){
+        //labels
+        if(tokens[i].back()==':'){
+            std::string tokn=tokens[i];
+            tokn.pop_back();
+            address_table[tokn]=address;
+            if(opendebug){
+                std::cout<<"\nLabel Address : "<<tokn <<" : "<<int(address_table[tokn])<<std::flush;
+            }
+        }
+        else{
+            if(tokens[i]=="inc" || tokens[i]=="dec" || tokens[i]=="push" || tokens[i]=="pop" || tokens[i]=="jle" || tokens[i]=="jge" ||  tokens[i]=="jl" || tokens[i]=="jg" ||  tokens[i]=="jz" || tokens[i]=="jnz" ||  tokens[i]=="jmp" ){
+                i+=1;
+            }else{
+                i+=2;
+            }
+            address+=3;
+        }
+    }
+    if(opendebug){
+        for(auto& el:address_table){
+            std::cout<<"\n"<<el.first<<" : "<<el.second;
+        }
+    }
+    
     for(size_t i=0;i<tokens.size();i++){
         if(opendebug){
             std::cout<<"\nToken : "+tokens[i]<<std::flush;
@@ -37,10 +65,6 @@ std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebu
         //labels
         if(tokens[i].back()==':'){
             tokens[i].pop_back();
-            address_table[tokens[i]]=(i==0)?(0):(i-1);
-            if(opendebug){
-                std::cout<<"\nLabel Address : "<<std::hex<<int(address_table[tokens[i]])<<std::flush;
-            }
         }
         //indirect load "lb A,[0xffff]" 
         else if(tokens[i]=="lb"){
@@ -273,6 +297,8 @@ std::vector<uint8_t> AssembleText(const std::string& assembly_code,bool opendebu
             throw std::runtime_error("Invalid Instruction! "+ tokens[i]);
         }
     }
+    
+
     return code;
 }
 uint8_t  Register8FromToken(const std::string& token){

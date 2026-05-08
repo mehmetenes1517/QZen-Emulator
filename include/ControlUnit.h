@@ -50,12 +50,12 @@ struct ControlUnit{
     public:
         friend uint8_t& DecodeRegister(ControlUnit& obj,uint8_t encoded_value);
 
-    float frequency_hz=2.0f;
+    float frequency_hz=1000.0;
     bool debugmode=true;
     Register16 AB={0x0000},CD={0x0000},XY={0x00};
     Register16 PC={0x0000};
-    Register16 BP={0x71CD},SP={0x71CD};
-    uint8_t FLAGS=0x00;// 0 -> zero bit , 1 -> sign bit , 2-> overflow bit
+    Register16 BP={0x71CE},SP={0x71CE};
+    uint8_t FLAGS=0x00;// 0 -> zero bit , 1 -> sign bit , 2-> carry bit
     Memory memory;
     ALU alu;
 

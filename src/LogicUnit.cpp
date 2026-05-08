@@ -68,6 +68,6 @@ void ALU::_dec_(uint8_t& reg1,uint8_t& flags){
 void ALU::_inc_(uint8_t& reg1,uint8_t& flags){
     ResetFlags(flags);
     uint8_t val=reg1+1;
-    if(val==0){SetZeroFlag(flags);}
+    if(val==0){SetCarryFlag(flags);}
     reg1=val;   
 }

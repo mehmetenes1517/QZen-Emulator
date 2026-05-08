@@ -7,8 +7,8 @@ ControlUnit::ControlUnit(float frequency,bool debug_on):frequency_hz(frequency),
 void ControlUnit::Restart(){
     AB=CD=XY={0x0000};
     PC={0X0000};
-    BP={0x71CD};
-    SP={0x71CD};
+    BP={0x71CE};
+    SP={0x71CE};
     ResetFlags(FLAGS);
     memory.data.fill(0x00);
 }
@@ -141,7 +141,7 @@ void ControlUnit::Run(){
     while (true){
         uint8_t command=Fetch();
         Decode_Execute(command);
-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0f*(1.0f/frequency_hz))));
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(500.0f*(1.0f/frequency_hz))));
         PC.value=PC.value%(0XFFFF+1);
     }
 }
@@ -270,12 +270,13 @@ void ControlUnit::Jump_nonzero(){
 void ControlUnit::Jump_Less(){
     if(GetCarryFlag(FLAGS)==1 && GetZeroFlag(FLAGS)==0){
         Jump();
-    }else{
+    }
+    else{
         PC.value+=2;
     }
 }
 void ControlUnit::Jump_LessEqual(){
-    if(GetCarryFlag(FLAGS)==1){
+    if(GetCarryFlag(FLAGS)==1 || GetZeroFlag(FLAGS)==1){
         Jump();
     }else{
         PC.value+=2;
@@ -289,7 +290,7 @@ void ControlUnit::Jump_Greater(){
     }
 }
 void ControlUnit::Jump_GreaterEqual(){
-    if(GetCarryFlag(FLAGS)==0){
+    if(GetCarryFlag(FLAGS)==0 || GetZeroFlag(FLAGS)==1){
         Jump();
     }else{
         PC.value+=2;
