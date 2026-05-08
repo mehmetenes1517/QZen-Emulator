@@ -1,6 +1,11 @@
 #include"../include/Main.h"
-#include<iostream>
-#include<raylib.h>
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <thread>
+#include <chrono>
+#include <raylib.h>
 
 
 
@@ -102,7 +107,8 @@ int main(){
     cpu.memory.Display();
     cpu.memory.write(0xffff,0xff);
     CloseWindow();
-    sleep(1);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 
 
