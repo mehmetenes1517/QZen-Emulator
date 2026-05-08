@@ -52,6 +52,8 @@ Instruction | Purpose | Code Macro | Instruction sequence size | Assembly code
 0x01 | load memory to B register | _LB_B | 3 | lb
 0x02 | load memory to C register | _LB_C | 3 | lb
 0x03 | load memory to D register | _LB_D | 3 | lb
+0x1F | load memory to D register | _LB_X | 3 | lb
+0x20 | load memory to D register | _LB_Y | 3 | lb
 0x04 | immediate mode load to registers | _LDI | 3 | ldi
 0x05 | copy register to another | _CPY | 3  | cpy
 0x06 | add registers | _ADD | 3 | add
@@ -75,8 +77,11 @@ Instruction | Purpose | Code Macro | Instruction sequence size | Assembly code
 0x18 | store B register to given 16bit memory address | _STRI_B | 3 | stri
 0x19 | store C register to given 16bit memory address | _STRI_C | 3 | stri
 0x1A | store D register to given 16bit memory address | _STRI_D | 3 | stri
+0x21 | store D register to given 16bit memory address | _STRI_X | 3 | stri
+0x22 | store D register to given 16bit memory address | _STRI_Y | 3 | stri
 0X1B | store given register's value as taking AB register's value as address | _STR_AB | 2 | str
 0X1C | store given register's value as taking CD register's value as address | _STR_CD | 2 | str
+0X23 | store given register's value as taking XY register's value as address | _STR_XY | 2 | str
 0X1D | push given register's value to stack | _PUSH | 2 | push
 0X1E | pop from stack to a register | _POP | 2 | pop
 
